@@ -1,0 +1,20 @@
+include data/train_hexamer_table.csv
+include data/train_ss_table_k1.csv
+include data/train_ss_table_k2.csv
+include data/train_ss_table_k3.csv
+include data/train_ss_table_k4.csv
+include data/train_ss_table_k5.csv
+include data/imputer_SIF_PF.pkl
+include data/scaler_SIF_PF.pkl
+include data/XGB_model_SIF_PF.pkl
+include data/imputer_SIF_PF_SSF.pkl
+include data/scaler_SIF_PF_SSF.pkl
+include data/XGB_model_SIF_PF_SSF.pkl
+include test/human_test_toy.fasta
+include test/mouse_test_toy.fasta
+include README.md
+include LICENSE
+include test_requirements.py
+include requirements.txt
+
+

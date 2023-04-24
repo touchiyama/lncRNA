@@ -1,0 +1,10 @@
+Metadata-Version: 2.1
+Name: lncDC
+Version: 1.3.5
+Summary: A tool for predicting the probability of a transcript being a long noncoding rna
+Home-page: https://github.com/lim74/LncDC
+Author: Minghua Li
+Author-email: lim74@miamioh.edu
+License: MIT
+Requires-Python: >=3.9
+License-File: LICENSE
