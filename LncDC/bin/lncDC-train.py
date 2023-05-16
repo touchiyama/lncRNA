@@ -65,7 +65,7 @@ def format_check(filename):
         print(filename + " format checking: PASS")
 
 
-def load_fasta(filename):
+def load_fasta(filename, flag):
     '''
     load_fasta
     Inputs:
@@ -75,7 +75,9 @@ def load_fasta(filename):
     '''
     sequences = []
     seq = ''
-    
+    if flag:
+        tx_ids = {'transcript_id': []}
+
     if filename.endswith((".gz", ".Z", ".z")):
         fd = gzip.open(filename, 'rt')
     else:
@@ -83,6 +85,10 @@ def load_fasta(filename):
 
     for line in fd:
         if line.startswith('>'):
+            # get transcript_id
+            if flag:
+                tx_id = ''
+                tx_ids['transcript_id'].append({'transcript_id': tx_id})
             if seq != '':
                 sequences.append(seq.replace('a','A').replace('t','T').replace('g','G').replace('c','C'))
             seq = ''
@@ -90,9 +96,14 @@ def load_fasta(filename):
             seq += line.strip()
     if seq != '':
         sequences.append(seq.replace('a','A').replace('t','T').replace('g','G').replace('c','C'))
-    
+
     fd.close()
-    return sequences
+    df_txid = pd.DataFrame(tx_ids)
+
+    if flag:
+        return sequences, df_txid
+    else:
+        return sequences
 
 def under_over_process(x, y, njobs):
     ratio = y.value_counts()[0] / y.value_counts()[1]
@@ -136,7 +147,7 @@ def main():
         thread = os.cpu_count()
     else:
         thread = thread
-        
+
     if ss_feature:
         try:
             import RNA
@@ -165,10 +176,10 @@ def main():
         os.makedirs(os.path.dirname(output_prefix), exist_ok = True)
 
     # load mrna data
-    mrna_data = load_fasta(mrna)
+    mrna_data, mrnaid_data = load_fasta(mrna, flag=True) #### modify
     # load cds data
-    cds_data = load_fasta(cds)
-    
+    cds_data = load_fasta(cds, flag=False)
+
     print()
     print("Initializing dataframe ...")
     # initialize a mrna dataframe
@@ -179,7 +190,7 @@ def main():
         mrna_dataset.loc[i, 'CDS_seq'] = cds_data[i]
 
     # load lncrna data
-    lncrna_data = load_fasta(lncrna)
+    lncrna_data, lncrnaid_data = load_fasta(lncrna, flag=True) #### modify
 
     # initialize a lncrna dataframe
     lncrna_dataset = pd.DataFrame(index=range(len(lncrna_data)), columns=['Sequence', 'type', 'CDS_seq'])
@@ -208,6 +219,16 @@ def main():
     # Calculate the length of the transcripts
     for i in range(dataset.index.size):
         dataset.loc[i,'Transcript_length'] = len(dataset.loc[i, 'Sequence'])
+
+    #### modify ---------
+    # add splicescore-derived maxentscan
+
+    #(i) mrna <- mrna_id
+
+    #(ii) lncrna <- lncrna_id
+
+    # ----
+
 
     # IF only use SIF and PF features
     if not ss_feature:
